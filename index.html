@@ -1,5 +1,21 @@
-<div id="logbook-root"></div>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logbook Kegiatan</title>
 <style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0e1a14;
+    padding: 24px 12px;
+  }
+
   #logbook-root {
     --paper: #eee6d3;
     --paper-line: #d8cca9;
@@ -12,6 +28,7 @@
     font-family: 'Courier New', 'Space Mono', monospace;
     color: var(--ink);
     max-width: 640px;
+    width: 100%;
     margin: 0 auto;
     background: var(--cover);
     background-image: linear-gradient(180deg, var(--cover) 0%, var(--cover-2) 100%);
@@ -19,8 +36,6 @@
     border-radius: 4px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.35);
   }
-
-  #logbook-root * { box-sizing: border-box; }
 
   .lb-cover-title {
     text-align: center;
@@ -34,8 +49,7 @@
 
   .lb-page {
     background: var(--paper);
-    background-image:
-      linear-gradient(var(--paper-line) 1px, transparent 1px);
+    background-image: linear-gradient(var(--paper-line) 1px, transparent 1px);
     background-size: 100% 34px;
     background-position: 0 60px;
     border-radius: 2px;
@@ -94,9 +108,7 @@
     letter-spacing: 2px;
   }
 
-  .lb-field {
-    margin-bottom: 16px;
-  }
+  .lb-field { margin-bottom: 16px; }
   .lb-field label {
     display: block;
     font-size: 10px;
@@ -121,9 +133,7 @@
     resize: vertical;
   }
   .lb-field input:focus,
-  .lb-field textarea:focus {
-    border-bottom: 1px solid var(--red);
-  }
+  .lb-field textarea:focus { border-bottom: 1px solid var(--red); }
   .lb-field textarea { min-height: 60px; line-height: 34px; padding-top: 0; }
 
   .lb-row2 { display: flex; gap: 18px; }
@@ -140,10 +150,7 @@
   }
   .lb-photo-box:hover { border-color: var(--red); background: rgba(166,61,51,0.04); }
   .lb-photo-box input { display: none; }
-  .lb-photo-box .lb-photo-label {
-    font-size: 12px;
-    color: var(--ink-soft);
-  }
+  .lb-photo-box .lb-photo-label { font-size: 12px; color: var(--ink-soft); }
   .lb-preview {
     margin-top: 10px;
     max-width: 100%;
@@ -161,11 +168,7 @@
     gap: 14px;
   }
 
-  .lb-status {
-    font-size: 11px;
-    color: var(--ink-soft);
-    letter-spacing: 0.5px;
-  }
+  .lb-status { font-size: 11px; color: var(--ink-soft); letter-spacing: 0.5px; }
   .lb-status.ok { color: #2f6b3c; font-weight: bold; }
   .lb-status.err { color: var(--red); font-weight: bold; }
 
@@ -200,65 +203,67 @@
     text-transform: uppercase;
   }
 </style>
+</head>
+<body>
+
+<div id="logbook-root">
+  <div class="lb-cover-title">— Buku Catatan Kegiatan —</div>
+  <div class="lb-page">
+    <div class="lb-holes"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="lb-header">
+      <h1>Logbook</h1>
+      <span>Entri Baru</span>
+    </div>
+
+    <div class="lb-row2">
+      <div class="lb-field">
+        <label>Tanggal</label>
+        <input type="date" id="lb-tanggal">
+      </div>
+      <div class="lb-field">
+        <label>Nama</label>
+        <input type="text" id="lb-nama" placeholder="Nama pengisi">
+      </div>
+    </div>
+
+    <div class="lb-field">
+      <label>Event / Organisasi</label>
+      <input type="text" id="lb-event" placeholder="Nama kegiatan atau organisasi">
+    </div>
+
+    <div class="lb-field">
+      <label>Keterangan</label>
+      <textarea id="lb-keterangan" placeholder="Uraikan kegiatan secara singkat..."></textarea>
+    </div>
+
+    <div class="lb-field">
+      <label>Bukti Gambar</label>
+      <div class="lb-photo-box" id="lb-photo-box">
+        <input type="file" id="lb-foto" accept="image/*" capture="environment">
+        <div class="lb-photo-label" id="lb-photo-label">Ketuk untuk pilih / ambil foto</div>
+        <img id="lb-preview" class="lb-preview" alt="preview">
+      </div>
+    </div>
+
+    <div class="lb-submit-wrap">
+      <div class="lb-status" id="lb-status"></div>
+      <button class="lb-stamp" id="lb-submit">Catat</button>
+    </div>
+  </div>
+  <div class="lb-footer-note">Tersimpan otomatis ke Google Sheets</div>
+</div>
 
 <script>
 (function () {
-  var APPS_SCRIPT_URL = https://script.google.com/macros/s/AKfycbxhHpVqnqd3PQ2eDun5lbdvvOT-xJMMAqI7es7bNqEAoP9Rkjvr7GlpHtsQpMQCkUcPew/exec;
+  var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxhHpVqnqd3PQ2eDun5lbdvvOT-xJMMAqI7es7bNqEAoP9Rkjvr7GlpHtsQpMQCkUcPew/exec";
 
   var root = document.getElementById('logbook-root');
-  root.innerHTML = `
-    <div class="lb-cover-title">— Buku Catatan Kegiatan —</div>
-    <div class="lb-page">
-      <div class="lb-holes"><span></span><span></span><span></span><span></span><span></span></div>
-      <div class="lb-header">
-        <h1>Logbook</h1>
-        <span>Entri Baru</span>
-      </div>
-
-      <div class="lb-row2">
-        <div class="lb-field">
-          <label>Tanggal</label>
-          <input type="date" id="lb-tanggal">
-        </div>
-        <div class="lb-field">
-          <label>Nama</label>
-          <input type="text" id="lb-nama" placeholder="Nama pengisi">
-        </div>
-      </div>
-
-      <div class="lb-field">
-        <label>Event / Organisasi</label>
-        <input type="text" id="lb-event" placeholder="Nama kegiatan atau organisasi">
-      </div>
-
-      <div class="lb-field">
-        <label>Keterangan</label>
-        <textarea id="lb-keterangan" placeholder="Uraikan kegiatan secara singkat..."></textarea>
-      </div>
-
-      <div class="lb-field">
-        <label>Bukti Gambar</label>
-        <div class="lb-photo-box" id="lb-photo-box">
-          <input type="file" id="lb-foto" accept="image/*" capture="environment">
-          <div class="lb-photo-label" id="lb-photo-label">Ketuk untuk pilih / ambil foto</div>
-          <img id="lb-preview" class="lb-preview">
-        </div>
-      </div>
-
-      <div class="lb-submit-wrap">
-        <div class="lb-status" id="lb-status"></div>
-        <button class="lb-stamp" id="lb-submit">Catat</button>
-      </div>
-    </div>
-    <div class="lb-footer-note">Tersimpan otomatis ke Google Sheets</div>
-  `;
-
-  var fotoInput = root.querySelector('#lb-foto');
-  var photoBox = root.querySelector('#lb-photo-box');
-  var preview = root.querySelector('#lb-preview');
-  var photoLabel = root.querySelector('#lb-photo-label');
-  var statusEl = root.querySelector('#lb-status');
-  var submitBtn = root.querySelector('#lb-submit');
+  var fotoInput = document.getElementById('lb-foto');
+  var photoBox = document.getElementById('lb-photo-box');
+  var preview = document.getElementById('lb-preview');
+  var photoLabel = document.getElementById('lb-photo-label');
+  var statusEl = document.getElementById('lb-status');
+  var submitBtn = document.getElementById('lb-submit');
 
   var imageBase64 = null;
   var imageMime = null;
@@ -282,19 +287,13 @@
   });
 
   submitBtn.addEventListener('click', function () {
-    var tanggal = root.querySelector('#lb-tanggal').value;
-    var nama = root.querySelector('#lb-nama').value.trim();
-    var event = root.querySelector('#lb-event').value.trim();
-    var keterangan = root.querySelector('#lb-keterangan').value.trim();
+    var tanggal = document.getElementById('lb-tanggal').value;
+    var nama = document.getElementById('lb-nama').value.trim();
+    var event = document.getElementById('lb-event').value.trim();
+    var keterangan = document.getElementById('lb-keterangan').value.trim();
 
     if (!tanggal || !nama || !event) {
       statusEl.textContent = 'Isi tanggal, nama, dan event dulu ya.';
-      statusEl.className = 'lb-status err';
-      return;
-    }
-
-    if (APPS_SCRIPT_URL.indexOf('PASTE_URL') !== -1) {
-      statusEl.textContent = 'URL Apps Script belum dipasang di kode.';
       statusEl.className = 'lb-status err';
       return;
     }
@@ -324,10 +323,10 @@
         if (data.status === 'success') {
           statusEl.textContent = 'Tersimpan ke Sheets ✓';
           statusEl.className = 'lb-status ok';
-          root.querySelector('#lb-tanggal').value = '';
-          root.querySelector('#lb-nama').value = '';
-          root.querySelector('#lb-event').value = '';
-          root.querySelector('#lb-keterangan').value = '';
+          document.getElementById('lb-tanggal').value = '';
+          document.getElementById('lb-nama').value = '';
+          document.getElementById('lb-event').value = '';
+          document.getElementById('lb-keterangan').value = '';
           fotoInput.value = '';
           imageBase64 = null;
           preview.style.display = 'none';
@@ -345,3 +344,6 @@
   });
 })();
 </script>
+
+</body>
+</html>
