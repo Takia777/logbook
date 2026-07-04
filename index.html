@@ -3,261 +3,440 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Logbook Kegiatan</title>
+<title>Logbook MudaCon</title>
 <style>
+  :root {
+    --bg: #f7f2ed;
+    --panel: #ffffff;
+    --surface: #fff7f0;
+    --border: #f0d2b2;
+    --text: #2f2d2a;
+    --muted: #7a6b64;
+    --brand: #f18f01;
+    --brand-soft: #ffb56b;
+    --danger: #c94a19;
+    --shadow: 0 24px 60px rgba(41,34,27,0.12);
+  }
   * { box-sizing: border-box; }
   body {
     margin: 0;
     min-height: 100vh;
+    font-family: Inter, 'Segoe UI', sans-serif;
+    background: radial-gradient(circle at top, rgba(241,143,1,0.14), transparent 28%),
+                linear-gradient(180deg, #fcf7f2 0%, #f7f2ed 100%);
+    color: var(--text);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #0e1a14;
-    padding: 24px 12px;
+    padding: 24px;
   }
+  a { color: inherit; text-decoration: none; }
 
   #logbook-root {
-    --paper: #eee6d3;
-    --paper-line: #d8cca9;
-    --cover: #1f3a2e;
-    --cover-2: #16281f;
-    --ink: #24291f;
-    --ink-soft: #5c5a4a;
-    --red: #a63d33;
-    --gold: #b8925a;
-    font-family: 'Courier New', 'Space Mono', monospace;
-    color: var(--ink);
-    max-width: 640px;
     width: 100%;
-    margin: 0 auto;
-    background: var(--cover);
-    background-image: linear-gradient(180deg, var(--cover) 0%, var(--cover-2) 100%);
+    max-width: 760px;
+    margin: auto;
     padding: 22px;
-    border-radius: 4px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.35);
   }
 
-  .lb-cover-title {
-    text-align: center;
-    color: var(--gold);
-    letter-spacing: 4px;
-    font-size: 12px;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-    opacity: 0.85;
-  }
-
-  .lb-page {
-    background: var(--paper);
-    background-image: linear-gradient(var(--paper-line) 1px, transparent 1px);
-    background-size: 100% 34px;
-    background-position: 0 60px;
-    border-radius: 2px;
-    position: relative;
-    padding: 28px 26px 26px 54px;
-    min-height: 420px;
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
-  }
-
-  .lb-page::before {
-    content: '';
-    position: absolute;
-    left: 34px;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: var(--red);
-    opacity: 0.55;
-  }
-
-  .lb-holes {
-    position: absolute;
-    left: 12px;
-    top: 30px;
-    bottom: 30px;
-    width: 8px;
+  .brand-panel {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 24px;
   }
-  .lb-holes span {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--cover);
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+  .brand-mark {
+    width: min(100%, 560px);
+    height: auto;
+    border-radius: 24px;
+    overflow: hidden;
+    background: transparent;
+    box-shadow: 0 18px 40px rgba(241,143,1,0.08);
+    display: block;
   }
-
-  .lb-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 18px;
-    border-bottom: 2px solid var(--ink);
-    padding-bottom: 10px;
+  .brand-mark img {
+    width: 100%;
+    height: auto;
+    display: block;
   }
-  .lb-header h1 {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 22px;
+  .brand-info {
+    text-align: center;
+  }
+  .lb-btn.fullwidth { width: 100%; justify-content: center; }
+  .sheet-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 10px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1px solid var(--brand);
+    background: white;
+    color: var(--brand);
     font-weight: 700;
-    margin: 0;
-    letter-spacing: 0.5px;
+    text-decoration: none;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
   }
-  .lb-header span {
-    font-size: 10px;
-    color: var(--ink-soft);
-    text-transform: uppercase;
-    letter-spacing: 2px;
+  .sheet-btn:hover { transform: translateY(-1px); box-shadow: 0 14px 30px rgba(241,143,1,0.12); background: #fffaf5; }
+  .sheet-btn img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    display: block;
+  }
+  .brand-info {
+    min-width: 0;
+  }
+  .brand-name {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .brand-moto {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
   }
 
-  .lb-field { margin-bottom: 16px; }
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .screen-card {
+    padding: 28px 26px 24px;
+  }
+  .screen.active { display: block; }
+  .screen.hidden { display: none; }
+
+  .section-title {
+    margin: 0 0 10px;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+  }
+  .section-subtitle {
+    margin: 0 0 24px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .lb-field { margin-bottom: 18px; }
   .lb-field label {
     display: block;
-    font-size: 10px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--red);
-    margin-bottom: 4px;
-    font-weight: bold;
+    color: var(--brand);
+    font-weight: 700;
   }
   .lb-field input[type="text"],
+  .lb-field input[type="password"],
   .lb-field input[type="date"],
   .lb-field textarea {
     width: 100%;
-    background: transparent;
-    border: none;
-    border-bottom: 1px dashed var(--ink-soft);
-    padding: 4px 2px 6px;
-    font-family: inherit;
-    font-size: 14px;
-    color: var(--ink);
+    border: 1px solid #eee;
+    border-radius: 14px;
+    background: #fff;
+    padding: 14px 16px;
+    font-size: 15px;
+    color: var(--text);
     outline: none;
-    resize: vertical;
+    transition: border-color .2s ease, box-shadow .2s ease;
   }
   .lb-field input:focus,
-  .lb-field textarea:focus { border-bottom: 1px solid var(--red); }
-  .lb-field textarea { min-height: 60px; line-height: 34px; padding-top: 0; }
+  .lb-field textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(241,143,1,0.12); }
+  .lb-field textarea {
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.7;
+  }
 
-  .lb-row2 { display: flex; gap: 18px; }
-  .lb-row2 > div { flex: 1; }
+  .lb-row2 { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
   .lb-photo-box {
-    border: 1px dashed var(--ink-soft);
-    border-radius: 3px;
-    padding: 14px;
-    text-align: center;
+    border: 1px dashed #f0d2b2;
+    border-radius: 18px;
+    padding: 20px;
+    background: var(--surface);
     cursor: pointer;
-    transition: border-color .15s ease, background .15s ease;
-    position: relative;
+    transition: border-color .2s ease, background .2s ease;
+    text-align: center;
   }
-  .lb-photo-box:hover { border-color: var(--red); background: rgba(166,61,51,0.04); }
+  .lb-photo-box:hover { border-color: var(--brand); background: #fff4ea; }
   .lb-photo-box input { display: none; }
-  .lb-photo-box .lb-photo-label { font-size: 12px; color: var(--ink-soft); }
+  .lb-photo-label { color: var(--muted); font-size: 14px; }
   .lb-preview {
-    margin-top: 10px;
-    max-width: 100%;
-    max-height: 160px;
-    border-radius: 2px;
+    margin-top: 16px;
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+    border-radius: 16px;
     display: none;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   }
 
-  .lb-submit-wrap {
+  .button-row {
     display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
     justify-content: flex-end;
-    margin-top: 22px;
+    align-items: center;
+    margin-top: 6px;
+  }
+  .lb-btn {
+    border: 0;
+    border-radius: 16px;
+    padding: 14px 22px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .lb-btn.primary {
+    background: linear-gradient(135deg, var(--brand), #ffb347);
+    color: white;
+    box-shadow: 0 16px 35px rgba(241,143,1,0.24);
+  }
+  .lb-btn.secondary {
+    background: #fff;
+    color: var(--text);
+    border: 1px solid #ebe3dc;
+  }
+  .lb-btn.link {
+    background: transparent;
+    color: var(--brand);
+    box-shadow: none;
+  }
+  .lb-btn:hover { transform: translateY(-1px); }
+  .lb-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .status-row {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
     gap: 14px;
-  }
-
-  .lb-status { font-size: 11px; color: var(--ink-soft); letter-spacing: 0.5px; }
-  .lb-status.ok { color: #2f6b3c; font-weight: bold; }
-  .lb-status.err { color: var(--red); font-weight: bold; }
-
-  .lb-stamp {
-    font-family: Georgia, serif;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-size: 13px;
-    color: var(--red);
-    background: transparent;
-    border: 3px solid var(--red);
-    border-radius: 50%;
-    width: 96px;
-    height: 96px;
-    cursor: pointer;
-    transform: rotate(-8deg);
-    transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
-    box-shadow: 0 0 0 2px rgba(166,61,51,0.15);
-  }
-  .lb-stamp:hover { transform: rotate(-8deg) scale(1.04); }
-  .lb-stamp:active { transform: rotate(-8deg) scale(0.92); box-shadow: none; }
-  .lb-stamp:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  .lb-footer-note {
-    text-align: center;
-    font-size: 9px;
-    color: var(--gold);
-    letter-spacing: 2px;
     margin-top: 12px;
-    opacity: 0.7;
-    text-transform: uppercase;
+    flex-wrap: wrap;
+  }
+  .lb-status { color: var(--muted); font-size: 13px; }
+  .lb-status.ok { color: #2f7b43; }
+  .lb-status.err { color: var(--danger); }
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(34, 26, 18, 0.44);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    z-index: 50;
+  }
+  .modal-backdrop.active { display: flex; }
+  .modal-card {
+    width: 100%;
+    max-width: 520px;
+    background: white;
+    border-radius: 30px;
+    box-shadow: 0 40px 90px rgba(43,33,27,0.22);
+    overflow: hidden;
+  }
+  .modal-content {
+    padding: 28px 28px 24px;
+  }
+  .modal-title {
+    margin: 0 0 12px;
+    font-size: 22px;
+  }
+  .modal-text {
+    color: var(--muted);
+    margin: 0 0 20px;
+    line-height: 1.8;
+  }
+  .summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+    display: grid;
+    gap: 12px;
+  }
+  .summary-list li {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 14px 16px;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .summary-list li span {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+  .summary-image {
+    width: 100%;
+    border-radius: 16px;
+    object-fit: cover;
+    max-height: 240px;
+  }
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .login-footer {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  @media (max-width: 640px) {
+    .lb-row2 { grid-template-columns: 1fr; }
+    .screen-card { padding: 22px 20px 20px; }
+    .brand-panel {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .brand-info {
+      text-align: left;
+      flex: 1;
+      min-width: 0;
+    }
+    .brand-mark {
+      width: 120px;
+      max-width: 120px;
+      border-radius: 18px;
+      box-shadow: 0 12px 30px rgba(241,143,1,0.08);
+    }
+    .modal-card { border-radius: 24px; }
   }
 </style>
 </head>
 <body>
-
 <div id="logbook-root">
-  <div class="lb-cover-title">— Buku Catatan Kegiatan —</div>
-  <div class="lb-page">
-    <div class="lb-holes"><span></span><span></span><span></span><span></span><span></span></div>
-    <div class="lb-header">
-      <h1>Logbook</h1>
-      <span>Entri Baru</span>
+  <div class="brand-panel">
+    <div class="brand-mark">
+      <img src="logo_mudacon.png" alt="Logo MudaCon">
     </div>
-
-    <div class="lb-row2">
-      <div class="lb-field">
-        <label>Tanggal</label>
-        <input type="date" id="lb-tanggal">
-      </div>
-      <div class="lb-field">
-        <label>Nama</label>
-        <input type="text" id="lb-nama" placeholder="Nama pengisi">
-      </div>
-    </div>
-
-    <div class="lb-field">
-      <label>Event / Organisasi</label>
-      <input type="text" id="lb-event" placeholder="Nama kegiatan atau organisasi">
-    </div>
-
-    <div class="lb-field">
-      <label>Keterangan</label>
-      <textarea id="lb-keterangan" placeholder="Uraikan kegiatan secara singkat..."></textarea>
-    </div>
-
-    <div class="lb-field">
-      <label>Bukti Gambar</label>
-      <div class="lb-photo-box" id="lb-photo-box">
-        <input type="file" id="lb-foto" accept="image/*" capture="environment">
-        <div class="lb-photo-label" id="lb-photo-label">Ketuk untuk pilih / ambil foto</div>
-        <img id="lb-preview" class="lb-preview" alt="preview">
-      </div>
-    </div>
-
-    <div class="lb-submit-wrap">
-      <div class="lb-status" id="lb-status"></div>
-      <button class="lb-stamp" id="lb-submit">Catat</button>
+    <div class="brand-info">
+      <h1 class="brand-name">Muda Convection</h1>
+      <p class="brand-moto">Your Ultimate Partner in Convection</p>
     </div>
   </div>
-  <div class="lb-footer-note">Tersimpan otomatis ke Google Sheets</div>
+
+  <div class="screen screen-login active" id="screen-login">
+    <div class="screen-card">
+      <h2 class="section-title">Login</h2>
+
+      <div class="lb-field">
+        <label for="login-password">Kata kunci</label>
+        <input type="password" id="login-password" placeholder="Masukkan kata kunci">
+      </div>
+
+      <div class="button-row">
+        <button class="lb-btn primary" id="login-button">Lanjut</button>
+      </div>
+      <div class="lb-status err" id="login-status"></div>
+    </div>
+  </div>
+
+  <div class="screen screen-form hidden" id="screen-form">
+    <div class="screen-card">
+      <h2 class="section-title">Logbook Aktivitas</h2>
+
+      <div class="lb-row2">
+        <div class="lb-field">
+          <label for="lb-tanggal">Tanggal</label>
+          <input type="date" id="lb-tanggal">
+        </div>
+        <div class="lb-field">
+          <label for="lb-nama">Nama</label>
+          <input type="text" id="lb-nama" placeholder="Nama pengisi">
+        </div>
+      </div>
+
+      <div class="lb-field">
+        <label for="lb-event">Aktivitas</label>
+        <input type="text" id="lb-event" placeholder="Nama kegiatan atau organisasi">
+      </div>
+
+      <div class="lb-field">
+        <label for="lb-keterangan">Keterangan</label>
+        <textarea id="lb-keterangan" placeholder="Uraikan aktivitas sedetail mungkin..."></textarea>
+      </div>
+
+      <div class="lb-field">
+        <label>Bukti/ Invoice/ Dokumentasi</label>
+        <div class="lb-photo-box" id="lb-photo-box">
+          <input type="file" id="lb-foto" accept="image/*" capture="environment">
+          <div class="lb-photo-label" id="lb-photo-label">Ketuk untuk pilih / ambil foto</div>
+          <img id="lb-preview" class="lb-preview" alt="preview">
+        </div>
+      </div>
+
+      <div class="status-row">
+        <div class="lb-status" id="lb-status"></div>
+      </div>
+      <div class="button-row" style="margin-top: 18px;">
+        <button class="lb-btn primary fullwidth" id="lb-submit">Submit</button>
+      </div>
+      <div style="margin-top: 18px;">
+        <a class="sheet-btn" href="https://docs.google.com/spreadsheets/d/1nRWfHTtTJ7JU29emcog3uSrEbR1PPnQ0UCx91-i2xho/edit?gid=0#gid=0" target="_blank">
+          <img src="logo_sheets.png" alt="Google Sheets logo">
+          Lihat Sheet
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="confirm-modal">
+  <div class="modal-card">
+    <div class="modal-content">
+      <h3 class="modal-title">Konfirmasi sebelum kirim</h3>
+      <p class="modal-text">Pastikan semua data sudah benar. Jika perlu koreksi, pilih edit.</p>
+      <ul class="summary-list" id="confirm-summary"></ul>
+      <div class="modal-actions">
+        <button class="lb-btn secondary" id="edit-button">Edit</button>
+        <button class="lb-btn primary" id="confirm-submit-button">Gas Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="success-modal">
+  <div class="modal-card">
+    <div class="modal-content">
+      <h3 class="modal-title">Yey! udah berhasil ke kirim nih</h3>
+      <div class="modal-actions">
+        <a class="lb-btn link" href="https://docs.google.com/spreadsheets/d/1nRWfHTtTJ7JU29emcog3uSrEbR1PPnQ0UCx91-i2xho/edit?gid=0#gid=0" target="_blank">Cek langsung di Sheets</a>
+        <button class="lb-btn secondary" id="close-success-button">Tutup</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
 (function () {
+  var PASSWORD = 'mudacon50juta';
   var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw5Wy8PBl8RcnElsV48nYoq3WzwidntXRwG15appMNNEvMPfH6sANyf4BtV8dOVjqmP5w/exec";
 
-  var root = document.getElementById('logbook-root');
+  var screenLogin = document.getElementById('screen-login');
+  var screenForm = document.getElementById('screen-form');
+  var loginPassword = document.getElementById('login-password');
+  var loginButton = document.getElementById('login-button');
+  var loginStatus = document.getElementById('login-status');
+
   var fotoInput = document.getElementById('lb-foto');
   var photoBox = document.getElementById('lb-photo-box');
   var preview = document.getElementById('lb-preview');
@@ -265,9 +444,78 @@
   var statusEl = document.getElementById('lb-status');
   var submitBtn = document.getElementById('lb-submit');
 
+  var confirmModal = document.getElementById('confirm-modal');
+  var successModal = document.getElementById('success-modal');
+  var confirmSummary = document.getElementById('confirm-summary');
+  var editButton = document.getElementById('edit-button');
+  var confirmSubmitButton = document.getElementById('confirm-submit-button');
+  var closeSuccessButton = document.getElementById('close-success-button');
+
   var imageBase64 = null;
   var imageMime = null;
   var imageName = null;
+
+  function showScreen(screen) {
+    screenLogin.classList.add('hidden');
+    screenForm.classList.add('hidden');
+    screen.classList.remove('hidden');
+    screen.classList.add('active');
+  }
+
+  function setStatus(element, message, type) {
+    element.textContent = message;
+    element.className = 'lb-status' + (type ? ' ' + type : '');
+  }
+
+  function showModal(modal) {
+    modal.classList.add('active');
+  }
+  function hideModal(modal) {
+    modal.classList.remove('active');
+  }
+
+  function resetForm() {
+    document.getElementById('lb-tanggal').value = '';
+    document.getElementById('lb-nama').value = '';
+    document.getElementById('lb-event').value = '';
+    document.getElementById('lb-keterangan').value = '';
+    fotoInput.value = '';
+    imageBase64 = null;
+    imageMime = null;
+    imageName = null;
+    preview.style.display = 'none';
+    photoLabel.textContent = 'Ketuk untuk pilih / ambil foto';
+    setStatus(statusEl, '', '');
+  }
+
+  function buildSummaryHtml(tanggal, nama, eventName, keterangan, imageName) {
+    var items = [];
+    items.push({ label: 'Tanggal', value: tanggal || '-' });
+    items.push({ label: 'Nama', value: nama || '-' });
+    items.push({ label: 'Event / Organisasi', value: eventName || '-' });
+    items.push({ label: 'Keterangan', value: keterangan || '-' });
+    items.push({ label: 'File gambar', value: imageName || 'Tidak ada file' });
+    return items.map(function(item) {
+      return '<li><span>' + item.label + '</span>' + item.value + '</li>';
+    }).join('');
+  }
+
+  loginButton.addEventListener('click', function () {
+    var value = loginPassword.value.trim();
+    if (value === PASSWORD) {
+      showScreen(screenForm);
+      loginPassword.value = '';
+      setStatus(loginStatus, '', '');
+    } else {
+      setStatus(loginStatus, 'hmmm kamu mencurigakan!', 'err');
+    }
+  });
+
+  loginPassword.addEventListener('keypress', function (event) {
+    if (event.key === 'Enter') {
+      loginButton.click();
+    }
+  });
 
   photoBox.addEventListener('click', function () { fotoInput.click(); });
 
@@ -289,23 +537,35 @@
   submitBtn.addEventListener('click', function () {
     var tanggal = document.getElementById('lb-tanggal').value;
     var nama = document.getElementById('lb-nama').value.trim();
-    var event = document.getElementById('lb-event').value.trim();
+    var eventName = document.getElementById('lb-event').value.trim();
     var keterangan = document.getElementById('lb-keterangan').value.trim();
 
-    if (!tanggal || !nama || !event) {
-      statusEl.textContent = 'Isi tanggal, nama, dan event dulu ya.';
-      statusEl.className = 'lb-status err';
+    if (!tanggal || !nama || !eventName) {
+      setStatus(statusEl, 'Isi tanggal, nama, dan event dulu ya.', 'err');
       return;
     }
 
-    submitBtn.disabled = true;
-    statusEl.textContent = 'Menyimpan...';
-    statusEl.className = 'lb-status';
+    confirmSummary.innerHTML = buildSummaryHtml(tanggal, nama, eventName, keterangan, imageName);
+    showModal(confirmModal);
+  });
+
+  editButton.addEventListener('click', function () {
+    hideModal(confirmModal);
+  });
+
+  confirmSubmitButton.addEventListener('click', function () {
+    var tanggal = document.getElementById('lb-tanggal').value;
+    var nama = document.getElementById('lb-nama').value.trim();
+    var eventName = document.getElementById('lb-event').value.trim();
+    var keterangan = document.getElementById('lb-keterangan').value.trim();
+
+    confirmSubmitButton.disabled = true;
+    confirmSubmitButton.textContent = 'Mengirim...';
 
     var payload = {
       tanggal: tanggal,
       nama: nama,
-      event: event,
+      event: eventName,
       keterangan: keterangan,
       image: imageBase64,
       mimeType: imageMime,
@@ -319,31 +579,29 @@
     })
       .then(function (res) { return res.json(); })
       .then(function (data) {
-        submitBtn.disabled = false;
+        confirmSubmitButton.disabled = false;
+        confirmSubmitButton.textContent = 'Gas Submit';
         if (data.status === 'success') {
-          statusEl.textContent = 'Tersimpan ke Sheets ✓';
-          statusEl.className = 'lb-status ok';
-          document.getElementById('lb-tanggal').value = '';
-          document.getElementById('lb-nama').value = '';
-          document.getElementById('lb-event').value = '';
-          document.getElementById('lb-keterangan').value = '';
-          fotoInput.value = '';
-          imageBase64 = null;
-          preview.style.display = 'none';
-          photoLabel.textContent = 'Ketuk untuk pilih / ambil foto';
+          hideModal(confirmModal);
+          showModal(successModal);
         } else {
-          statusEl.textContent = 'Gagal: ' + (data.message || 'error tidak diketahui');
-          statusEl.className = 'lb-status err';
+          setStatus(statusEl, 'Gagal: ' + (data.message || 'error tidak diketahui'), 'err');
+          hideModal(confirmModal);
         }
       })
       .catch(function (err) {
-        submitBtn.disabled = false;
-        statusEl.textContent = 'Gagal terkirim: ' + err.message;
-        statusEl.className = 'lb-status err';
+        confirmSubmitButton.disabled = false;
+        confirmSubmitButton.textContent = 'Gas Submit';
+        setStatus(statusEl, 'Gagal terkirim: ' + err.message, 'err');
+        hideModal(confirmModal);
       });
+  });
+
+  closeSuccessButton.addEventListener('click', function () {
+    hideModal(successModal);
+    resetForm();
   });
 })();
 </script>
-
 </body>
 </html>
