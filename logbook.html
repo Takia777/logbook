@@ -1,0 +1,347 @@
+<div id="logbook-root"></div>
+<style>
+  #logbook-root {
+    --paper: #eee6d3;
+    --paper-line: #d8cca9;
+    --cover: #1f3a2e;
+    --cover-2: #16281f;
+    --ink: #24291f;
+    --ink-soft: #5c5a4a;
+    --red: #a63d33;
+    --gold: #b8925a;
+    font-family: 'Courier New', 'Space Mono', monospace;
+    color: var(--ink);
+    max-width: 640px;
+    margin: 0 auto;
+    background: var(--cover);
+    background-image: linear-gradient(180deg, var(--cover) 0%, var(--cover-2) 100%);
+    padding: 22px;
+    border-radius: 4px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+  }
+
+  #logbook-root * { box-sizing: border-box; }
+
+  .lb-cover-title {
+    text-align: center;
+    color: var(--gold);
+    letter-spacing: 4px;
+    font-size: 12px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    opacity: 0.85;
+  }
+
+  .lb-page {
+    background: var(--paper);
+    background-image:
+      linear-gradient(var(--paper-line) 1px, transparent 1px);
+    background-size: 100% 34px;
+    background-position: 0 60px;
+    border-radius: 2px;
+    position: relative;
+    padding: 28px 26px 26px 54px;
+    min-height: 420px;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+  }
+
+  .lb-page::before {
+    content: '';
+    position: absolute;
+    left: 34px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--red);
+    opacity: 0.55;
+  }
+
+  .lb-holes {
+    position: absolute;
+    left: 12px;
+    top: 30px;
+    bottom: 30px;
+    width: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .lb-holes span {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--cover);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+  }
+
+  .lb-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 18px;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 10px;
+  }
+  .lb-header h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+  .lb-header span {
+    font-size: 10px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .lb-field {
+    margin-bottom: 16px;
+  }
+  .lb-field label {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--red);
+    margin-bottom: 4px;
+    font-weight: bold;
+  }
+  .lb-field input[type="text"],
+  .lb-field input[type="date"],
+  .lb-field textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed var(--ink-soft);
+    padding: 4px 2px 6px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+    resize: vertical;
+  }
+  .lb-field input:focus,
+  .lb-field textarea:focus {
+    border-bottom: 1px solid var(--red);
+  }
+  .lb-field textarea { min-height: 60px; line-height: 34px; padding-top: 0; }
+
+  .lb-row2 { display: flex; gap: 18px; }
+  .lb-row2 > div { flex: 1; }
+
+  .lb-photo-box {
+    border: 1px dashed var(--ink-soft);
+    border-radius: 3px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+    position: relative;
+  }
+  .lb-photo-box:hover { border-color: var(--red); background: rgba(166,61,51,0.04); }
+  .lb-photo-box input { display: none; }
+  .lb-photo-box .lb-photo-label {
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .lb-preview {
+    margin-top: 10px;
+    max-width: 100%;
+    max-height: 160px;
+    border-radius: 2px;
+    display: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+
+  .lb-submit-wrap {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 22px;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .lb-status {
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.5px;
+  }
+  .lb-status.ok { color: #2f6b3c; font-weight: bold; }
+  .lb-status.err { color: var(--red); font-weight: bold; }
+
+  .lb-stamp {
+    font-family: Georgia, serif;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 13px;
+    color: var(--red);
+    background: transparent;
+    border: 3px solid var(--red);
+    border-radius: 50%;
+    width: 96px;
+    height: 96px;
+    cursor: pointer;
+    transform: rotate(-8deg);
+    transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+    box-shadow: 0 0 0 2px rgba(166,61,51,0.15);
+  }
+  .lb-stamp:hover { transform: rotate(-8deg) scale(1.04); }
+  .lb-stamp:active { transform: rotate(-8deg) scale(0.92); box-shadow: none; }
+  .lb-stamp:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .lb-footer-note {
+    text-align: center;
+    font-size: 9px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    margin-top: 12px;
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
+</style>
+
+<script>
+(function () {
+  var APPS_SCRIPT_URL = "PASTE_URL_WEB_APP_ANDA_DI_SINI";
+
+  var root = document.getElementById('logbook-root');
+  root.innerHTML = `
+    <div class="lb-cover-title">— Buku Catatan Kegiatan —</div>
+    <div class="lb-page">
+      <div class="lb-holes"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="lb-header">
+        <h1>Logbook</h1>
+        <span>Entri Baru</span>
+      </div>
+
+      <div class="lb-row2">
+        <div class="lb-field">
+          <label>Tanggal</label>
+          <input type="date" id="lb-tanggal">
+        </div>
+        <div class="lb-field">
+          <label>Nama</label>
+          <input type="text" id="lb-nama" placeholder="Nama pengisi">
+        </div>
+      </div>
+
+      <div class="lb-field">
+        <label>Event / Organisasi</label>
+        <input type="text" id="lb-event" placeholder="Nama kegiatan atau organisasi">
+      </div>
+
+      <div class="lb-field">
+        <label>Keterangan</label>
+        <textarea id="lb-keterangan" placeholder="Uraikan kegiatan secara singkat..."></textarea>
+      </div>
+
+      <div class="lb-field">
+        <label>Bukti Gambar</label>
+        <div class="lb-photo-box" id="lb-photo-box">
+          <input type="file" id="lb-foto" accept="image/*" capture="environment">
+          <div class="lb-photo-label" id="lb-photo-label">Ketuk untuk pilih / ambil foto</div>
+          <img id="lb-preview" class="lb-preview">
+        </div>
+      </div>
+
+      <div class="lb-submit-wrap">
+        <div class="lb-status" id="lb-status"></div>
+        <button class="lb-stamp" id="lb-submit">Catat</button>
+      </div>
+    </div>
+    <div class="lb-footer-note">Tersimpan otomatis ke Google Sheets</div>
+  `;
+
+  var fotoInput = root.querySelector('#lb-foto');
+  var photoBox = root.querySelector('#lb-photo-box');
+  var preview = root.querySelector('#lb-preview');
+  var photoLabel = root.querySelector('#lb-photo-label');
+  var statusEl = root.querySelector('#lb-status');
+  var submitBtn = root.querySelector('#lb-submit');
+
+  var imageBase64 = null;
+  var imageMime = null;
+  var imageName = null;
+
+  photoBox.addEventListener('click', function () { fotoInput.click(); });
+
+  fotoInput.addEventListener('change', function () {
+    var file = fotoInput.files[0];
+    if (!file) return;
+    imageMime = file.type;
+    imageName = file.name;
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      imageBase64 = e.target.result;
+      preview.src = imageBase64;
+      preview.style.display = 'block';
+      photoLabel.textContent = file.name;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  submitBtn.addEventListener('click', function () {
+    var tanggal = root.querySelector('#lb-tanggal').value;
+    var nama = root.querySelector('#lb-nama').value.trim();
+    var event = root.querySelector('#lb-event').value.trim();
+    var keterangan = root.querySelector('#lb-keterangan').value.trim();
+
+    if (!tanggal || !nama || !event) {
+      statusEl.textContent = 'Isi tanggal, nama, dan event dulu ya.';
+      statusEl.className = 'lb-status err';
+      return;
+    }
+
+    if (APPS_SCRIPT_URL.indexOf('PASTE_URL') !== -1) {
+      statusEl.textContent = 'URL Apps Script belum dipasang di kode.';
+      statusEl.className = 'lb-status err';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    statusEl.textContent = 'Menyimpan...';
+    statusEl.className = 'lb-status';
+
+    var payload = {
+      tanggal: tanggal,
+      nama: nama,
+      event: event,
+      keterangan: keterangan,
+      image: imageBase64,
+      mimeType: imageMime,
+      fileName: imageName
+    };
+
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        submitBtn.disabled = false;
+        if (data.status === 'success') {
+          statusEl.textContent = 'Tersimpan ke Sheets ✓';
+          statusEl.className = 'lb-status ok';
+          root.querySelector('#lb-tanggal').value = '';
+          root.querySelector('#lb-nama').value = '';
+          root.querySelector('#lb-event').value = '';
+          root.querySelector('#lb-keterangan').value = '';
+          fotoInput.value = '';
+          imageBase64 = null;
+          preview.style.display = 'none';
+          photoLabel.textContent = 'Ketuk untuk pilih / ambil foto';
+        } else {
+          statusEl.textContent = 'Gagal: ' + (data.message || 'error tidak diketahui');
+          statusEl.className = 'lb-status err';
+        }
+      })
+      .catch(function (err) {
+        submitBtn.disabled = false;
+        statusEl.textContent = 'Gagal terkirim: ' + err.message;
+        statusEl.className = 'lb-status err';
+      });
+  });
+})();
+</script>
